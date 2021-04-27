@@ -14,23 +14,17 @@ class App extends Component {
       {id: 'id-3', name: 'Eden Clements', number: '645-17-79'},
       {id: 'id-4', name: 'Annie Copeland', number: '227-91-26'},
     ],
-    name: '',
-    number: '',
     filter: '',
   }
-
-  handleChange = event => {
-    const { name, value } = event.currentTarget;
-    this.setState({ [name]: value });
-  };
 
   nameCheked = ( contacts, name ) => {
     return contacts.find(contact => name === contact.name);
   }
 
-  handlePhoneAdd = event => {
-    const { name, number, contacts } = this.state;
-    event.preventDefault();
+  handlePhoneAdd = contact => {
+    const { contacts } = this.state;
+    const { name, number } = contact;
+    
     const id = uuidv4();
     const doublCheckedName = this.nameCheked(contacts, name);
 
@@ -66,16 +60,13 @@ class App extends Component {
   }
 
   render () {
-    const { name, number, filter } = this.state;
+    const { filter } = this.state;
     const renderedContacts = this.filteredContacts();
 
     return (
       <Container>
         <h1>Phonebook</h1>
         <ContactForm 
-        name={name}
-        number={number}
-        handleChange={this.handleChange}
         handlePhoneAdd={this.handlePhoneAdd}
         />
         <h2>Contacts</h2>
