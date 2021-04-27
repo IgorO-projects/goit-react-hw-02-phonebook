@@ -1,61 +1,93 @@
 import { Component } from "react";
-import Container from './components/Container';
 import { v4 as uuidv4 } from 'uuid';
+
+import Container from './components/Container';
+import ContactForm from './components/ContactForm';
+import Filter from './components/Filter';
+import ContactList from './components/ContactList';
 
 class App extends Component {
   state = {
-    contacts: [],
+    contacts: [
+      {id: 'id-1', name: 'Rosie Simpson', number: '459-12-56'},
+      {id: 'id-2', name: 'Hermione Kline', number: '443-89-12'},
+      {id: 'id-3', name: 'Eden Clements', number: '645-17-79'},
+      {id: 'id-4', name: 'Annie Copeland', number: '227-91-26'},
+    ],
     name: '',
-    number: ''
+    number: '',
+    filter: '',
   }
 
   handleChange = event => {
     const { name, value } = event.currentTarget;
-    this.setState({ [name]: value })
+    this.setState({ [name]: value });
+  };
+
+  nameCheked = ( contacts, name ) => {
+    return contacts.find(contact => name === contact.name);
   }
 
   handlePhoneAdd = event => {
-    event.preventDefault()
-    const name = this.state.name;
+    const { name, number, contacts } = this.state;
+    event.preventDefault();
     const id = uuidv4();
+    const doublCheckedName = this.nameCheked(contacts, name);
 
-    this.state.contacts.push({ id: id, name: name });
-    console.log(this.state.contacts);
+    if(doublCheckedName) {
+      alert(`${name} is already in Phonebook`)
+      return;
+    }
+
+    this.setState( prevState => ({
+      contacts: [...prevState.contacts, { id: id, name: name, number: number }]}
+    ));
+    console.log(contacts);
+  };
+
+  onChangeFilter = event => {
+     this.setState({ filter: event.currentTarget.value});
+  }
+
+  filteredContacts = () => {
+    const { filter, contacts } = this.state;
+    const normalizedFilter = filter.toLowerCase();
+    
+    if(filter) {
+      return contacts.filter(contact => contact.name.toLowerCase().includes(normalizedFilter));
+    }
+    return contacts;
+  }
+
+  deletedContactbyId = (id) => {
+    console.log(id)
+    this.setState(prevState=> ({
+      contacts: prevState.contacts.filter(contact => contact.id !== id)
+    }))
   }
 
   render () {
+    const { name, number, filter } = this.state;
+    const renderedContacts = this.filteredContacts();
 
     return (
       <Container>
-        <form>
-          <label>Name
-          <br/>
-          <input
-          type="text"
-          name="name"
-          value={this.state.name}
-          onChange={this.handleChange}
-          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-          title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
-          required
-          />
-          </label>
-          <br/>
-          <button 
-          type="submit"
-          onClick={this.handlePhoneAdd}
-          >Add contact</button>
-        </form>
-
-        <ul>
-          {this.state.contacts.map(contact => {
-            return (
-              <li key={contact.id}>
-                <p>{contact.name}</p>
-              </li>
-            )
-          })}
-        </ul>
+        <h1>Phonebook</h1>
+        <ContactForm 
+        name={name}
+        number={number}
+        handleChange={this.handleChange}
+        handlePhoneAdd={this.handlePhoneAdd}
+        />
+        <h2>Contacts</h2>
+        <Filter 
+        filter={filter}
+        onChangeFilter={this.onChangeFilter}
+        />
+        <ContactList 
+        renderedContacts={renderedContacts}
+        deletedContactbyId={this.deletedContactbyId}
+        />
       </Container>
     );
   }
