@@ -1,14 +1,18 @@
 import PropTypes from 'prop-types';
+import styles from './Filter.module.css';
+
 
 const Filter = ({ filter, onChangeFilter }) => {
     return (
         <form>
           <label>
-            <input 
+            <input
+            className={styles.input}
             type="text"
             name="filter"
             value={filter}
             onChange={onChangeFilter}
+            placeholder="Find person"
             />
           </label>
         </form>
